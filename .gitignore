@@ -1,0 +1,12 @@
+
+.vite/
+vite/deps/
+
+__pycache__/
+*.py[cod]
+
+node_modules/
+dist/
+build/
+.env
+.env.local
