@@ -286,7 +286,15 @@ import { useState } from 'react';
 import { Moon, Footprints, Users, BookOpen, Smartphone, Sparkles } from 'lucide-react';
 
 export function ActivityLogForm() {
-  const [formData, setFormData] = useState({
+  interface ActivityFormData {
+  sleepTime: string;
+  steps: string;
+  socialInteractions: string;
+  studyTime: string;
+  screenTime: string;
+}
+
+  const [formData, setFormData] = useState<ActivityFormData>({
     sleepTime: '',
     steps: '',
     socialInteractions: '',
@@ -304,10 +312,13 @@ export function ActivityLogForm() {
   const [prediction, setPrediction] = useState<Prediction | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    setPrediction(null);
-  };
+ const handleChange = (field: keyof ActivityFormData, value: string) => {
+  // Block negative values
+  if (value !== '' && Number(value) < 0) return;
+
+  setFormData(prev => ({ ...prev, [field]: value }));
+  setPrediction(null);
+};
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -385,6 +396,7 @@ export function ActivityLogForm() {
           <div className="relative">
             <input
               type="number"
+              min={0}
               step="0.5"
               value={formData.sleepTime}
               onChange={(e) => handleChange('sleepTime', e.target.value)}
