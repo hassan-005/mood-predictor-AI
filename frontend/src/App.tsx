@@ -9,7 +9,7 @@ export default function App() {
           <div className="text-center mb-8 md:mb-12">
             <h1 className="text-indigo-600 mb-3">Mood Predictor AI</h1>
             <p className="text-gray-600 max-w-md mx-auto">
-              Track your daily habits and build a healthier routine. Take a moment to log today's activities.
+              Analyze your daily habits and build a healthier routine. Take a moment to log today's activities.
             </p>
           </div>
 

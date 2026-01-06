@@ -284,6 +284,7 @@
 
 import { useState } from 'react';
 import { Moon, Footprints, Users, BookOpen, Smartphone, Sparkles } from 'lucide-react';
+import { InputError } from './InputErrors';
 
 export function ActivityLogForm() {
   interface ActivityFormData {
@@ -293,6 +294,8 @@ export function ActivityLogForm() {
   studyTime: string;
   screenTime: string;
 }
+type FormErrors = Partial<Record<keyof ActivityFormData, string>>;
+
 
   const [formData, setFormData] = useState<ActivityFormData>({
     sleepTime: '',
@@ -311,14 +314,36 @@ export function ActivityLogForm() {
 
   const [prediction, setPrediction] = useState<Prediction | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const timeFields: (keyof ActivityFormData)[] = ["sleepTime", "studyTime","screenTime"]
 
- const handleChange = (field: keyof ActivityFormData, value: string) => {
-  // Block negative values
-  if (value !== '' && Number(value) < 0) return;
+//  const handleChange = (field: keyof ActivityFormData, value: string) => {
+//   // Block negative values
+//   if (value !== '' && Number(value) < 0) return;
+
+//   setFormData(prev => ({ ...prev, [field]: value }));
+//   setPrediction(null);
+// };
+
+const handleChange = (field: keyof ActivityFormData, value:string) => {
+  let error = "";
+
+  if (value === "") {
+    error = "This field is required";
+  } else if (Number(value) < 0) {
+    error = "Value cannot be negative";
+  } else if(timeFields.includes(field)&& Number(value)>24){
+    error = "Value cannot be greater than 24 hours";
+  }
+
 
   setFormData(prev => ({ ...prev, [field]: value }));
+
+  setErrors(prev => ({ ...prev, [field]: error }));
+
   setPrediction(null);
 };
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -381,7 +406,7 @@ export function ActivityLogForm() {
   };
 
 
-  const isFormValid = Object.values(formData).every(value => value !== '');
+  const isFormValid = Object.values(formData).every(value => value !== ''|| Number(value) > 0);
 
   return (
     <div className="bg-white rounded-2xl shadow-lg shadow-indigo-100 p-6 md:p-8">
@@ -397,6 +422,7 @@ export function ActivityLogForm() {
             <input
               type="number"
               min={0}
+              max={24}
               step="0.5"
               value={formData.sleepTime}
               onChange={(e) => handleChange('sleepTime', e.target.value)}
@@ -408,6 +434,7 @@ export function ActivityLogForm() {
               hours
             </span>
           </div>
+          <InputError message={errors.sleepTime}/>
         </div>
 
         {/* Steps */}
@@ -419,11 +446,13 @@ export function ActivityLogForm() {
           <input
             type="number"
             value={formData.steps}
+            min={0}
             onChange={(e) => handleChange('steps', e.target.value)}
             placeholder="e.g., 8000"
             required
             className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-400 focus:outline-none"
-          />                      
+          />  
+          <InputError message={errors.steps}/>                    
         </div>
 
         {/* Social Interactions */}
@@ -435,11 +464,13 @@ export function ActivityLogForm() {
           <input
             type="number"
             value={formData.socialInteractions}
+            min={0}
             onChange={(e) => handleChange('socialInteractions', e.target.value)}
             placeholder="e.g., 5"
             required
             className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:outline-none"
           />
+          <InputError message={errors.socialInteractions}/>
         </div>
 
         {/* Study */}
@@ -452,6 +483,8 @@ export function ActivityLogForm() {
           <input
             type="number"
             step="0.5"
+            min={0}
+            max={24}
             value={formData.studyTime}
             onChange={(e) => handleChange('studyTime', e.target.value)}
             placeholder="e.g., 3"
@@ -462,6 +495,7 @@ export function ActivityLogForm() {
               hours
             </span>
             </div>
+            <InputError message={errors.studyTime}/>
         </div>
 
         {/* Screen */}
@@ -474,6 +508,8 @@ export function ActivityLogForm() {
           <input
             type="number"
             step="0.5"
+            min={0}
+            max={24}
             value={formData.screenTime}
             onChange={(e) => handleChange('screenTime', e.target.value)}
             placeholder="e.g., 4.5"
@@ -484,6 +520,7 @@ export function ActivityLogForm() {
               hours
             </span>
             </div>
+            <InputError message={errors.screenTime}/>
         </div>
 
         {/* Button */}
